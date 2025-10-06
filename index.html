@@ -1,0 +1,263 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Watering Hole — Creativity Compounded</title>
+  <meta name="description" content="A cast of creative students at Boston College, coming together to create.">
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', sans-serif;
+      overflow-x: hidden;
+      background: black;
+    }
+
+    #root {
+      position: relative;
+      width: 100%;
+      min-height: 100vh;
+      background-color: black;
+      overflow: hidden;
+    }
+
+    .star {
+      position: absolute;
+      border-radius: 50%;
+      background-color: white;
+      animation: pulse 2s ease-in-out infinite;
+    }
+
+    .lightning {
+      position: absolute;
+      opacity: 0;
+      animation: lightning 0.8s ease-out;
+    }
+
+    .content {
+      position: relative;
+      z-index: 10;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      min-height: 100vh;
+      padding: 0 24px;
+      text-align: center;
+    }
+
+    .title-container {
+      position: relative;
+      margin-bottom: 48px;
+    }
+
+    .title {
+      font-size: clamp(3rem, 10vw, 7rem);
+      font-weight: bold;
+      color: white;
+      position: relative;
+      z-index: 10;
+      font-family: Georgia, "Times New Roman", serif;
+      letter-spacing: 0.02em;
+      text-shadow: 0 0 40px rgba(139, 92, 246, 0.6), 0 0 80px rgba(139, 92, 246, 0.3);
+    }
+
+    .title-glow {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      width: 140%;
+      height: 160%;
+      background: radial-gradient(ellipse, rgba(139, 92, 246, 0.3), transparent 70%);
+      filter: blur(80px);
+      animation: pulse 3s ease-in-out infinite;
+    }
+
+    .subtitle {
+      font-size: clamp(1.125rem, 2vw, 1.5rem);
+      max-width: 48rem;
+      margin-bottom: 64px;
+      line-height: 1.6;
+      font-family: Georgia, "Times New Roman", serif;
+    }
+
+    .subtitle-light {
+      color: #a0a0a0;
+      font-weight: 300;
+    }
+
+    .subtitle-bold {
+      color: #ffffff;
+      font-weight: 700;
+    }
+
+    .cta-container {
+      position: relative;
+      text-decoration: none;
+    }
+
+    .cta-glow {
+      position: absolute;
+      inset: 0;
+      border-radius: 9999px;
+      background: linear-gradient(to right, rgb(168, 85, 247), white);
+      opacity: 0.75;
+      filter: blur(24px);
+      animation: pulse 2s ease-in-out infinite;
+    }
+
+    .cta-button {
+      position: relative;
+      padding: 24px 48px;
+      border-radius: 9999px;
+      background: linear-gradient(to bottom right, rgb(147, 51, 234), rgb(192, 132, 252), white);
+      color: black;
+      font-weight: bold;
+      font-size: 1.25rem;
+      box-shadow: 0 0 60px rgba(139, 92, 246, 0.6), inset 0 0 30px rgba(255, 255, 255, 0.3);
+      font-family: Georgia, "Times New Roman", serif;
+      cursor: pointer;
+      transition: transform 0.3s;
+    }
+
+    .cta-button:hover {
+      transform: scale(1.1);
+    }
+
+    @keyframes pulse {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0.5; }
+    }
+
+    @keyframes lightning {
+      0%, 100% { opacity: 0; }
+      10% { opacity: 1; }
+      20% { opacity: 0; }
+      30% { opacity: 0.8; }
+      40%, 100% { opacity: 0; }
+    }
+  </style>
+</head>
+<body>
+  <div id="root"></div>
+
+  <script>
+    const root = document.getElementById('root');
+    let mousePos = { x: window.innerWidth / 2, y: window.innerHeight / 2 };
+    let targetX = window.innerWidth / 2;
+    let targetY = window.innerHeight / 2;
+
+    // Generate stars
+    const stars = Array.from({ length: 55 }, () => ({
+      x: Math.random() * 100,
+      y: Math.random() * 100,
+      size: Math.random() * 2 + 1,
+      delay: Math.random() * 3,
+      element: null
+    }));
+
+    stars.forEach(star => {
+      const el = document.createElement('div');
+      el.className = 'star';
+      el.style.left = `${star.x}%`;
+      el.style.top = `${star.y}%`;
+      el.style.width = `${star.size}px`;
+      el.style.height = `${star.size}px`;
+      el.style.animationDelay = `${star.delay}s`;
+      root.appendChild(el);
+      star.element = el;
+    });
+
+    // Mouse tracking
+    window.addEventListener('mousemove', (e) => {
+      targetX = e.clientX;
+      targetY = e.clientY;
+    });
+
+    function animate() {
+      mousePos.x += (targetX - mousePos.x) * 0.1;
+      mousePos.y += (targetY - mousePos.y) * 0.1;
+
+      stars.forEach(star => {
+        const starX = (star.x / 100) * window.innerWidth;
+        const starY = (star.y / 100) * window.innerHeight;
+        const dx = starX - mousePos.x;
+        const dy = starY - mousePos.y;
+        const distance = Math.sqrt(dx * dx + dy * dy);
+        const maxDistance = 200;
+
+        if (distance < maxDistance) {
+          const strength = 1 - (distance / maxDistance);
+          const pushX = (dx / distance) * strength * 40;
+          const pushY = (dy / distance) * strength * 40;
+          star.element.style.transform = `translate(${pushX}px, ${pushY}px) scale(${1 + strength * 0.3})`;
+        } else {
+          star.element.style.transform = 'translate(0, 0) scale(1)';
+        }
+      });
+
+      requestAnimationFrame(animate);
+    }
+    animate();
+
+    // Lightning
+    function triggerLightning() {
+      if (Math.random() > 0.7) {
+        const lightning = document.createElement('div');
+        lightning.className = 'lightning';
+        lightning.style.left = `${Math.random() * 100}%`;
+        lightning.style.top = `${Math.random() * 30}%`;
+        lightning.style.transform = `rotate(${Math.random() * 60 - 30}deg)`;
+        lightning.innerHTML = `
+          <svg width="3" height="200" viewBox="0 0 3 200">
+            <path d="M1.5 0 L2 50 L1 50 L2.5 100 L1 100 L2 150 L0.5 150 L1.5 200" stroke="#a78bfa" stroke-width="2" fill="none" filter="url(#glow)"/>
+            <defs>
+              <filter id="glow">
+                <feGaussianBlur stdDeviation="3" result="coloredBlur"/>
+                <feMerge>
+                  <feMergeNode in="coloredBlur"/>
+                  <feMergeNode in="SourceGraphic"/>
+                </feMerge>
+              </filter>
+            </defs>
+          </svg>
+        `;
+        root.appendChild(lightning);
+        setTimeout(() => lightning.remove(), 800);
+      }
+    }
+    setInterval(triggerLightning, 3000);
+
+    // Content
+    const content = document.createElement('div');
+    content.className = 'content';
+    content.innerHTML = `
+      <div class="title-container">
+        <h1 class="title">WATERING HOLE</h1>
+        <div class="title-glow"></div>
+      </div>
+      <p class="subtitle">
+        <span class="subtitle-light">See if you're a fit for The Watering Hole, where interesting, </span>
+        <span class="subtitle-bold">entrepreneurial</span>
+        <span class="subtitle-light">, passion project building students come together & </span>
+        <span class="subtitle-bold">creativity is compounded</span>
+        <span class="subtitle-light">.</span>
+      </p>
+      <a href="https://form.typeform.com/to/B1aak5qf" target="_blank" rel="noopener noreferrer" class="cta-container">
+        <div>
+          <div class="cta-glow"></div>
+          <div class="cta-button">Enter the Collective</div>
+        </div>
+      </a>
+    `;
+    root.appendChild(content);
+  </script>
+</body>
+</html>
